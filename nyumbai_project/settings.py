@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'properties',
     'users',
     'notifications',
+    'payments',
 ]
 
 MIDDLEWARE = [
