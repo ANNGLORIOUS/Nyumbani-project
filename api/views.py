@@ -1,5 +1,6 @@
 from rest_framework import viewsets, permissions
 from rest_framework.permissions import IsAuthenticated
+from api.permissions import IsOwner, IsOwnerOrReadOnly, IsOwnerOrCaretaker
 from properties.models import Property
 from users.models import MaintenanceRequest
 from payments.models import Payment
@@ -19,6 +20,12 @@ class PropertyViewSet(viewsets.ModelViewSet):
     serializer_class = PropertySerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
+    def get_permissions(self):
+        # owner must be authenticated to create
+        if self.action == 'create':
+            return [IsAuthenticated(), IsOwner()]
+        return [p() for p in self.permission_classes]
+    
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
@@ -40,6 +47,12 @@ class MaintenanceViewSet(viewsets.ModelViewSet):
         if user.role == 'owner':
             return qs.filter(property__owner=user)
         return MaintenanceRequest.objects.none()
+    
+    def get_permissions(self):
+        if self.action in ('partial_update', 'update'):
+            # only owner or caretaker can update status/details
+            return [IsAuthenticated(), IsOwnerOrCaretaker()]
+        return [IsAuthenticated()]
 
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all().select_related('tenant','property')

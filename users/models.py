@@ -13,7 +13,7 @@ class CustomUser(AbstractUser):
         ('caretaker', 'Caretaker'),
     )
 
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='tenant')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     id_number = models.CharField(max_length=20, blank=True, null=True)
 
