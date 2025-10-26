@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Nyumbai Properties</title>
+</head>
+<body>
+  <h1>Available Properties</h1>
+  <ul>
+    {% for property in properties %}
+      <li>{{ property.name }} - {{ property.location }} - Ksh {{ property.rent_price }}</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>
