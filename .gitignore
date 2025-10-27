@@ -1,0 +1,38 @@
+# Python & Django ignores
+
+# Virtual environment
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+local_settings.py
+
+# Environment variables
+.env
+
+# IDEs and system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Migrations (optional - if you don’t want to track them)
+# ** uncomment the next line only if you know what you're doing **
+*/migrations/
+
+# Coverage & test
+htmlcov/
+.tox/
+.coverage
+.pytest_cache/
