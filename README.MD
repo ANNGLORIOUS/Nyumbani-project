@@ -11,14 +11,14 @@ Nyumbani is a Django-based property management system for:
 
 This project is set up so it can run locally even if you do not have live SMS or M-Pesa credentials yet.
 
-## What is already working
+<!-- ## What is already working
 
 - the project starts correctly
 - the main API routes are connected
 - property endpoints now return API responses instead of a missing HTML page
 - M-Pesa can run in safe simulation mode for demos and testing
 - SMS sending is disabled by default so local use does not fail
-- automated smoke tests pass
+- automated smoke tests pass -->
 
 ## Before you start
 
