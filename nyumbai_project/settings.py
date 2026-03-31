@@ -34,7 +34,10 @@ SECRET_KEY = 'django-insecure-=!kxycbfc-cwaiw=30w&5*%yqkn&k9qm$h=cavfafs-%k44yo_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [host.strip() for host in os.getenv(
+    "DJANGO_ALLOWED_HOSTS",
+    "127.0.0.1,localhost",
+).split(",") if host.strip()]
 
 
 # Application definition
@@ -141,7 +144,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Nairobi'
 
 USE_I18N = True
 
@@ -157,3 +160,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ✅ M-Pesa API Configuration
+MPESA_CONSUMER_KEY = os.getenv("MPESA_CONSUMER_KEY")
+MPESA_CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET")
+MPESA_SHORTCODE = os.getenv("MPESA_SHORTCODE")
+MPESA_PASSKEY = os.getenv("MPESA_PASSKEY")
+MPESA_BASE_URL = os.getenv("MPESA_BASE_URL", "https://sandbox.safaricom.co.ke")
+MPESA_CALLBACK_SECRET = os.getenv("MPESA_CALLBACK_SECRET", "")
+MPESA_TIMEOUT = int(os.getenv("MPESA_TIMEOUT", "15"))
+MPESA_SIMULATE = os.getenv("MPESA_SIMULATE", "true").lower() in ("1", "true", "yes", "on")
