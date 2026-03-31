@@ -20,6 +20,7 @@ local_settings.py
 
 # Environment variables
 .env
+.env.example   
 
 # IDEs and system files
 .vscode/
@@ -36,3 +37,5 @@ htmlcov/
 .tox/
 .coverage
 .pytest_cache/
+
+ 
