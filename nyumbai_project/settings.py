@@ -19,6 +19,7 @@ load_dotenv()
 
 AFRICASTALKING_USERNAME = os.getenv("AFRICASTALKING_USERNAME")
 AFRICASTALKING_API_KEY = os.getenv("AFRICASTALKING_API_KEY")
+SMS_ENABLED = os.getenv("SMS_ENABLED", "false").lower() in ("1", "true", "yes", "on")
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

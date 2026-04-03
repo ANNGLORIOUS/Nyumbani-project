@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nyumbani Dashboard</title>
+    <style>
+        :root {
+            --sand: #f6efe3;
+            --earth: #9b6b43;
+            --forest: #1f4d3b;
+            --sun: #e4a93b;
+            --ink: #1d1d1d;
+            --muted: #6b6b6b;
+            --paper: #fffdf8;
+            --line: rgba(31, 77, 59, 0.12);
+            --card-shadow: 0 18px 40px rgba(31, 77, 59, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(228, 169, 59, 0.24), transparent 28%),
+                radial-gradient(circle at top right, rgba(31, 77, 59, 0.18), transparent 25%),
+                linear-gradient(180deg, #fcf8f1 0%, #f2eadc 100%);
+        }
+
+        .page {
+            width: min(1180px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 32px 0 56px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(31, 77, 59, 0.96), rgba(66, 44, 19, 0.9));
+            color: white;
+            border-radius: 28px;
+            padding: 36px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            right: -40px;
+            top: -40px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(228, 169, 59, 0.18);
+        }
+
+        .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 0.78rem;
+            color: #f7dca0;
+            margin-bottom: 12px;
+        }
+
+        h1, h2, h3, p {
+            margin-top: 0;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            line-height: 1.02;
+            max-width: 10ch;
+            margin-bottom: 14px;
+        }
+
+        .hero p {
+            max-width: 60ch;
+            color: rgba(255, 255, 255, 0.86);
+            font-size: 1rem;
+        }
+
+        .hero-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .hero-links a {
+            text-decoration: none;
+            color: var(--forest);
+            background: #f6efe3;
+            padding: 12px 16px;
+            border-radius: 999px;
+            font-weight: bold;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 18px;
+            margin-top: 22px;
+        }
+
+        .card {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            padding: 22px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .stat-card {
+            grid-column: span 3;
+            min-height: 140px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            color: var(--forest);
+            margin: 10px 0 6px;
+            font-weight: bold;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .wide {
+            grid-column: span 8;
+        }
+
+        .side {
+            grid-column: span 4;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        .property-list,
+        .feed-list,
+        .account-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .property-item,
+        .feed-item,
+        .account-item {
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 16px;
+            background: white;
+        }
+
+        .property-meta,
+        .feed-meta {
+            color: var(--muted);
+            font-size: 0.92rem;
+            margin-bottom: 8px;
+        }
+
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(31, 77, 59, 0.08);
+            color: var(--forest);
+            font-size: 0.88rem;
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .account-item strong {
+            display: block;
+            color: var(--forest);
+            margin-bottom: 6px;
+        }
+
+        .highlight {
+            color: var(--sun);
+        }
+
+        @media (max-width: 960px) {
+            .stat-card, .wide, .side {
+                grid-column: 1 / -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <section class="hero">
+            <div class="eyebrow">Nyumbani Demo Dashboard</div>
+            <h1>Property listing and management made visible.</h1>
+            <p>
+                This local dashboard shows how Nyumbani connects landlords, tenants, and agents or caretakers,
+                with listing activity, maintenance tracking, simulated M-Pesa payments, and real-time notification flows.
+            </p>
+            <div class="hero-links">
+                <a href="/admin/">Open Admin</a>
+                <a href="/api/status/">API Status</a>
+                <a href="/api/properties/">Properties API</a>
+                <a href="/api/users/register/">Users API</a>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="card stat-card">
+                <div class="muted">Active Listings</div>
+                <div class="stat-value">{{ stats.properties }}</div>
+                <div class="muted">{{ stats.available_units }} units currently available</div>
+            </article>
+            <article class="card stat-card">
+                <div class="muted">Platform Users</div>
+                <div class="stat-value">{{ stats.owners|add:stats.tenants|add:stats.agents }}</div>
+                <div class="muted">{{ stats.owners }} landlords, {{ stats.tenants }} tenants, {{ stats.agents }} agents</div>
+            </article>
+            <article class="card stat-card">
+                <div class="muted">Property Inquiries</div>
+                <div class="stat-value">{{ stats.inquiries }}</div>
+                <div class="muted">New leads and listing interest</div>
+            </article>
+            <article class="card stat-card">
+                <div class="muted">Confirmed Rent</div>
+                <div class="stat-value">Ksh {{ stats.confirmed_payments_total }}</div>
+                <div class="muted">{{ stats.payments }} payment records in the system</div>
+            </article>
+
+            <article class="card wide">
+                <div class="section-title">
+                    <h2>Featured Listings</h2>
+                    <span class="muted">Live from your demo database</span>
+                </div>
+                <div class="property-list">
+                    {% for property in recent_properties %}
+                        <div class="property-item">
+                            <div class="property-meta">{{ property.location }} | Managed by {{ property.owner.username }}</div>
+                            <h3>{{ property.name }}</h3>
+                            <p>{{ property.description|default:"A listed property ready for renters, landlords, and agents to manage." }}</p>
+                            <div class="pill-row">
+                                <span class="pill">Rent: Ksh {{ property.rent_price }}</span>
+                                <span class="pill">Units: {{ property.available_units }}</span>
+                                <span class="pill">Caretaker: {% if property.caretaker %}{{ property.caretaker.username }}{% else %}Not assigned{% endif %}</span>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="property-item">
+                            <h3>No properties yet</h3>
+                            <p>Run <code>python3 manage.py seed_demo_data</code> to load the demo listings.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <aside class="card side">
+                <div class="section-title">
+                    <h2>Demo Accounts</h2>
+                    <span class="highlight">Ready to use</span>
+                </div>
+                <div class="account-list">
+                    {% for account in demo_accounts %}
+                        <div class="account-item">
+                            <strong>{{ account.role }}</strong>
+                            <div><code>{{ account.username }}</code></div>
+                            <div><code>{{ account.password }}</code></div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </aside>
+
+            <article class="card side">
+                <div class="section-title">
+                    <h2>Recent Inquiries</h2>
+                    <span class="muted">Listing interest</span>
+                </div>
+                <div class="feed-list">
+                    {% for inquiry in recent_inquiries %}
+                        <div class="feed-item">
+                            <div class="feed-meta">{{ inquiry.created_at|date:"M d, Y H:i" }}</div>
+                            <strong>{{ inquiry.name }}</strong>
+                            <div>{{ inquiry.property.name }}</div>
+                            <p>{{ inquiry.message }}</p>
+                        </div>
+                    {% empty %}
+                        <div class="feed-item">No inquiries yet.</div>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="card side">
+                <div class="section-title">
+                    <h2>Maintenance</h2>
+                    <span class="muted">Tenant issues</span>
+                </div>
+                <div class="feed-list">
+                    {% for request in maintenance_requests %}
+                        <div class="feed-item">
+                            <div class="feed-meta">{{ request.property.name }} | {{ request.status }}</div>
+                            <strong>{{ request.issue_type|title }}</strong>
+                            <div>{{ request.tenant.username }}</div>
+                            <p>{{ request.description }}</p>
+                        </div>
+                    {% empty %}
+                        <div class="feed-item">No maintenance requests yet.</div>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="card side">
+                <div class="section-title">
+                    <h2>Payments</h2>
+                    <span class="muted">Simulated M-Pesa</span>
+                </div>
+                <div class="feed-list">
+                    {% for payment in recent_payments %}
+                        <div class="feed-item">
+                            <div class="feed-meta">{{ payment.created_at|date:"M d, Y H:i" }}</div>
+                            <strong>{{ payment.tenant.username }}</strong>
+                            <div>{{ payment.property.name }}</div>
+                            <p>Ksh {{ payment.amount }} | Status: {{ payment.status }}</p>
+                        </div>
+                    {% empty %}
+                        <div class="feed-item">No payment activity yet.</div>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="card full">
+                <div class="section-title">
+                    <h2>Notification Feed</h2>
+                    <span class="muted">SMS and system alerts</span>
+                </div>
+                <div class="feed-list">
+                    {% for notification in recent_notifications %}
+                        <div class="feed-item">
+                            <div class="feed-meta">{{ notification.created_at|date:"M d, Y H:i" }} | {{ notification.notif_type }}</div>
+                            <strong>{{ notification.user.username }}</strong>
+                            <p>{{ notification.message }}</p>
+                        </div>
+                    {% empty %}
+                        <div class="feed-item">No notifications yet.</div>
+                    {% endfor %}
+                </div>
+            </article>
+        </section>
+    </div>
+</body>
+</html>

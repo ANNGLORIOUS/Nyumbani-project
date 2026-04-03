@@ -10,7 +10,7 @@ from properties.models import Property
 User = get_user_model()
 
 
-@override_settings(MPESA_SIMULATE=True, MPESA_CALLBACK_SECRET="test-secret")
+@override_settings(MPESA_SIMULATE=True, MPESA_CALLBACK_SECRET="test-secret", SMS_ENABLED=False)
 class PaymentApiTests(APITestCase):
     def setUp(self):
         self.owner = User.objects.create_user(

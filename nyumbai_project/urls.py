@@ -15,29 +15,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.http import JsonResponse
 from django.urls import path, include
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-
-
-def home(request):
-    return JsonResponse({
-        "name": "Nyumbani Property Management API",
-        "status": "ok",
-        "endpoints": {
-            "users": "/api/users/",
-            "properties": "/api/properties/",
-            "payments": "/api/payments/",
-            "admin": "/admin/",
-        },
-    })
+from .views import api_status, home
 
 
 urlpatterns = [
     path('', home, name='home'),
+    path('api/status/', api_status, name='api-status'),
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),   
     path('api/properties/', include('properties.urls')),
@@ -48,7 +36,6 @@ urlpatterns = [
     # path('api/', include('maintenance.urls')),
 
 ]
-
 
 
 

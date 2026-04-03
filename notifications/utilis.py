@@ -1,6 +1,7 @@
 import logging
 import os
 
+from django.conf import settings
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,7 +15,7 @@ except ImportError:  # pragma: no cover - exercised indirectly in environments w
 
 
 def _get_sms_client():
-    sms_enabled = os.getenv("SMS_ENABLED", "false").lower() in ("1", "true", "yes", "on")
+    sms_enabled = getattr(settings, "SMS_ENABLED", os.getenv("SMS_ENABLED", "false").lower() in ("1", "true", "yes", "on"))
     username = os.getenv("AFRICASTALKING_USERNAME")
     api_key = os.getenv("AFRICASTALKING_API_KEY")
     if not sms_enabled or not africastalking or not username or not api_key:

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.conf import settings
-from properties.models import Property
+from properties.models import Inquiry, Property
 from users.models import MaintenanceRequest
 from payments.models import Payment
 from notifications.models import Notification
@@ -18,6 +18,15 @@ class PropertySerializer(serializers.ModelSerializer):
         model = Property
         fields = '__all__'
         read_only_fields = ('owner','created_at')
+
+
+class InquirySerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Inquiry
+        fields = "__all__"
+        read_only_fields = ("sender", "created_at", "property")
 
 class MaintenanceSerializer(serializers.ModelSerializer):
     tenant = UserSerializer(read_only=True)

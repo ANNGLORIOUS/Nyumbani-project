@@ -52,23 +52,30 @@ cp .env.example .env
 python3 manage.py migrate
 ```
 
-5. Start the project:
+5. Load demo data so you can immediately see the app working:
+
+```bash
+python3 manage.py seed_demo_data
+```
+
+6. Start the project:
 
 ```bash
 python3 manage.py runserver
 ```
 
-6. Open this address in your browser:
+7. Open this address in your browser:
 
 ```text
 http://127.0.0.1:8000/
 ```
 
-If the project is running well, you will see a small JSON response showing the system status and the main API routes.
+If the project is running well, you will see a dashboard with live demo data, listings, notifications, inquiries, maintenance requests, and simulated payment activity.
 
 ## Main links
 
 - Home: `http://127.0.0.1:8000/`
+- API status: `http://127.0.0.1:8000/api/status/`
 - Admin panel: `http://127.0.0.1:8000/admin/`
 - Users API: `http://127.0.0.1:8000/api/users/`
 - Properties API: `http://127.0.0.1:8000/api/properties/`
@@ -87,6 +94,14 @@ Then sign in at:
 ```text
 http://127.0.0.1:8000/admin/
 ```
+
+## Demo accounts
+
+If you ran `python3 manage.py seed_demo_data`, these accounts are available:
+
+- landlord: `landlord_demo` / `DemoPass123`
+- agent or caretaker: `agent_demo` / `DemoPass123`
+- tenant: `tenant_demo` / `DemoPass123`
 
 <!-- ## Important note about payments
 
