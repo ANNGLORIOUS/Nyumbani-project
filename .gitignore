@@ -38,3 +38,6 @@ htmlcov/
 # React build dependencies and output
 frontend/node_modules/
 frontend/dist/
+frontend/*.js
+frontend/*.d.ts
+frontend/*.tsbuildinfo
