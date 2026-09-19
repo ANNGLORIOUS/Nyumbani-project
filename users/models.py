@@ -10,7 +10,11 @@ class CustomUser(AbstractUser):
     ROLE_CHOICES = (
         ('tenant', 'Tenant'),
         ('owner', 'Owner'),
-        ('caretaker', 'Caretaker'),
+        ('agent', 'Agent'),
+        # Kept so existing caretaker accounts remain usable while they are migrated
+        # to the more specific agent role.
+        ('caretaker', 'Caretaker (legacy)'),
+        ('admin', 'Administrator'),
     )
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)

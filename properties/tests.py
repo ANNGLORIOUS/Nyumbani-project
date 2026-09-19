@@ -44,6 +44,15 @@ class PropertyApiTests(APITestCase):
         self.assertEqual(Property.objects.count(), 1)
         self.assertEqual(Property.objects.first().owner, self.owner)
 
+    def test_anyone_can_browse_listings(self):
+        Property.objects.create(
+            owner=self.owner, name="Public Listing", location="Nairobi",
+            rent_price="25000.00", available_units=1,
+        )
+        response = self.client.get(reverse("property-list-create"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]["name"], "Public Listing")
+
     def test_tenant_cannot_create_property(self):
         self.client.force_authenticate(user=self.tenant)
         response = self.client.post(

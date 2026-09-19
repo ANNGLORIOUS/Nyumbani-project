@@ -6,10 +6,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.serializers import MaintenanceSerializer
-from notifications.utils import send_sms
+from notifications.services import notify
+from notifications.templates import maintenance_alert
 from .models import MaintenanceRequest
-from .serializers import RegisterSerializer, UserSerializer
+from .serializers import MaintenanceSerializer, RegisterSerializer, UserSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -47,8 +47,5 @@ class MaintenanceViewSet(viewsets.ModelViewSet):
 
         # Send SMS to caretaker
         if caretaker_phone:
-            send_sms(
-                caretaker_phone,
-                f"New maintenance issue from {request.tenant.username}: {request.issue_type} - {request.description}"
-            )
+            notify(request.property.caretaker, maintenance_alert(request.tenant.username, request.issue_type))
         logger.info("Maintenance request %s saved successfully.", request.id)

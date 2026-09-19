@@ -30,10 +30,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=!kxycbfc-cwaiw=30w&5*%yqkn&k9qm$h=cavfafs-%k44yo_'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'unsafe-development-key-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', 'true').lower() in ('1', 'true', 'yes', 'on')
 
 ALLOWED_HOSTS = [host.strip() for host in os.getenv(
     "DJANGO_ALLOWED_HOSTS",
@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     'payments',
     'rest_framework',
     'rest_framework_simplejwt',
-    'api',
 ]
 
 MIDDLEWARE = [
@@ -156,6 +155,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -171,3 +172,7 @@ MPESA_BASE_URL = os.getenv("MPESA_BASE_URL", "https://sandbox.safaricom.co.ke")
 MPESA_CALLBACK_SECRET = os.getenv("MPESA_CALLBACK_SECRET", "")
 MPESA_TIMEOUT = int(os.getenv("MPESA_TIMEOUT", "15"))
 MPESA_SIMULATE = os.getenv("MPESA_SIMULATE", "true").lower() in ("1", "true", "yes", "on")
+
+# SMS tasks are queued only when a broker/worker is deliberately configured.
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'memory://')
+NOTIFICATIONS_ASYNC = os.getenv('NOTIFICATIONS_ASYNC', 'false').lower() in ('1', 'true', 'yes', 'on')

@@ -1,14 +1,16 @@
 # payments/views.py
-import os
+from decimal import Decimal, InvalidOperation
 from django.conf import settings
 from django.utils import timezone
+from django.db import transaction
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import generics
-from .models import Payment
+from .models import Payment, RentRecord
 from .mpesa import lipa_na_mpesa  # your existing mpesa helper
-from notifications.utilis import send_sms
+from notifications.services import notify
+from notifications.templates import payment_confirmation, payment_failed
 from .serializers import PaymentSerializer
 
 # ---------- initiate_payment ----------
@@ -22,14 +24,34 @@ def initiate_payment(request):
     phone = request.data.get('phone')
     amount = request.data.get('amount')
     property_id = request.data.get('property')
+    rent_record_id = request.data.get('rent_record')
 
     if not phone or not amount:
         return Response({"error": "phone and amount required"}, status=400)
 
-    # Create DB record first (pending)
+    rent_record = None
+    if rent_record_id:
+        rent_record = RentRecord.objects.select_related('lease', 'lease__property').filter(
+            pk=rent_record_id, lease__tenant=request.user
+        ).first()
+        if not rent_record:
+            return Response({'error': 'Rent record not found.'}, status=404)
+        property_id = rent_record.lease.property_id
+        try:
+            amount = Decimal(str(amount))
+        except (InvalidOperation, TypeError):
+            return Response({'error': 'Amount must be a valid number.'}, status=400)
+        if amount <= 0:
+            return Response({'error': 'Amount must be greater than zero.'}, status=400)
+        if amount > rent_record.balance:
+            return Response({'error': 'Amount exceeds outstanding rent balance.'}, status=400)
+
+    # Create the pending payment before the STK request so its checkout ID can
+    # be reconciled safely by the callback.
     payment = Payment.objects.create(
         tenant=request.user,
         property_id=property_id,
+        rent_record=rent_record,
         amount=amount,
         status='pending'
     )
@@ -92,16 +114,11 @@ def mpesa_callback(request):
     if result_code == 0:
         # success
         if payment:
-            payment.status = 'confirmed'
-            payment.confirmed_at = timezone.now()
-            payment.save()
-            # send SMS to tenant
-            tenant_phone = payment.tenant.phone_number
-            if tenant_phone:
-                send_sms(
-                    tenant_phone,
-                    f"✅ Nyumbani: payment of Ksh {payment.amount} confirmed. Txn: {checkout_id}"
-                )
+            with transaction.atomic():
+                if payment.confirm(timezone.now()):
+                    payment.refresh_from_db()
+                    balance = payment.rent_record.balance if payment.rent_record_id else None
+                    notify(payment.tenant, payment_confirmation(payment.amount, balance))
         else:
             print("mpesa_callback: payment not found for checkout_id:", checkout_id)
         return Response({"ResultCode": 0, "ResultDesc": "Payment confirmed processed"}, status=200)
@@ -110,13 +127,7 @@ def mpesa_callback(request):
         if payment:
             payment.status = 'failed'
             payment.save()
-            # optional: send SMS failure notice
-            tenant_phone = payment.tenant.phone_number
-            if tenant_phone:
-                send_sms(
-                    tenant_phone,
-                    f"❌ Nyumbani: your payment attempt failed (Txn: {checkout_id}). Please try again."
-                )
+            notify(payment.tenant, payment_failed())
         return Response({"ResultCode": 0, "ResultDesc": "Processed (failed/cancelled)"}, status=200)
     
 

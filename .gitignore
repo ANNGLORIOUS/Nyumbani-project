@@ -20,7 +20,6 @@ local_settings.py
 
 # Environment variables
 .env
-.env.example   
 
 # IDEs and system files
 .vscode/
@@ -28,14 +27,10 @@ local_settings.py
 .DS_Store
 Thumbs.db
 
-# Migrations (optional - if you don’t want to track them)
-# ** uncomment the next line only if you know what you're doing **
-*/migrations/
+# Keep schema migrations under version control.
 
 # Coverage & test
 htmlcov/
 .tox/
 .coverage
 .pytest_cache/
-
- 

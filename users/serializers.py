@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
+from .models import MaintenanceRequest
 
 User = get_user_model()
 
@@ -40,13 +41,16 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
     def to_representation(self, instance):
-        """
-        Return created user + JWT tokens.
-        """
         data = UserSerializer(instance).data
         refresh = RefreshToken.for_user(instance)
-        data['tokens'] = {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token)
-        }
+        data['tokens'] = {'refresh': str(refresh), 'access': str(refresh.access_token)}
         return data
+
+
+class MaintenanceSerializer(serializers.ModelSerializer):
+    tenant = UserSerializer(read_only=True)
+
+    class Meta:
+        model = MaintenanceRequest
+        fields = '__all__'
+        read_only_fields = ('tenant', 'created_at', 'updated_at')

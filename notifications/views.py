@@ -1,7 +1,4 @@
-from django.shortcuts import render
+"""Notification HTTP views belong here when the app exposes them.
 
-# Create your views here.
-from notifications.utilis import send_sms
-
-send_sms("+254712345678", "Your rent payment was received successfully.")
-
+Importing this module deliberately has no side effects.
+"""

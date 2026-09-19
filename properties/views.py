@@ -1,42 +1,38 @@
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from api.permissions import IsOwner, IsOwnerOrReadOnly
-from api.serializers import InquirySerializer, PropertySerializer
-from notifications.models import Notification
-from notifications.utils import send_sms
+from .permissions import CanManageProperty, IsPropertyOwnerOrAgent
+from .serializers import InquirySerializer, PropertySerializer
+from notifications.services import notify
+from notifications.templates import new_inquiry
 from .models import Inquiry, Property
 
 
 class PropertyListCreateView(generics.ListCreateAPIView):
     queryset = Property.objects.all().select_related("owner", "caretaker")
     serializer_class = PropertySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_permissions(self):
         if self.request.method == "POST":
-            return [IsAuthenticated(), IsOwner()]
+            return [IsAuthenticated(), CanManageProperty()]
         return [permission() for permission in self.permission_classes]
 
     def perform_create(self, serializer):
         property_obj = serializer.save(owner=self.request.user)
         if property_obj.caretaker:
-            Notification.objects.create(
-                user=property_obj.caretaker,
-                notif_type="system",
-                message=f"New listing assigned: {property_obj.name} in {property_obj.location}.",
-            )
-            if property_obj.caretaker.phone_number:
-                send_sms(
-                    property_obj.caretaker.phone_number,
-                    f"Nyumbani listing alert: {property_obj.name} in {property_obj.location} has been assigned to you.",
-                )
+            notify(property_obj.caretaker, f"New listing assigned: {property_obj.name} in {property_obj.location}.", 'system')
 
 
 class PropertyDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Property.objects.all().select_related("owner", "caretaker")
     serializer_class = PropertySerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [AllowAny]
+
+    def get_permissions(self):
+        if self.request.method in ('GET', 'HEAD', 'OPTIONS'):
+            return [AllowAny()]
+        return [IsAuthenticated(), IsPropertyOwnerOrAgent()]
 
 
 class InquiryListCreateView(generics.ListCreateAPIView):
@@ -57,7 +53,7 @@ class InquiryListCreateView(generics.ListCreateAPIView):
             return Inquiry.objects.none()
         if user.role == "owner":
             return qs.filter(property__owner=user)
-        if user.role == "caretaker":
+        if user.role in ("caretaker", "agent"):
             return qs.filter(property__caretaker=user)
         return qs.filter(sender=user)
 
@@ -71,13 +67,4 @@ class InquiryListCreateView(generics.ListCreateAPIView):
             recipients.append(property_obj.caretaker)
 
         for recipient in recipients:
-            Notification.objects.create(
-                user=recipient,
-                notif_type="sms",
-                message=f"New inquiry for {property_obj.name} from {inquiry.name}: {inquiry.message}",
-            )
-            if recipient.phone_number:
-                send_sms(
-                    recipient.phone_number,
-                    f"Nyumbani inquiry: {inquiry.name} is interested in {property_obj.name}.",
-                )
+            notify(recipient, new_inquiry(property_obj.name, inquiry.name))
