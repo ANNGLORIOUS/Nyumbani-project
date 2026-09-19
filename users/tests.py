@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -21,3 +22,12 @@ class UserApiTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["username"], "tenant1")
         self.assertIn("tokens", response.data)
+
+    def test_authenticated_user_can_fetch_their_identity(self):
+        user = get_user_model().objects.create_user(
+            username="owner1", password="StrongPass123", role="owner"
+        )
+        self.client.force_authenticate(user=user)
+        response = self.client.get(reverse("current-user"))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["role"], "owner")

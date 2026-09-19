@@ -28,6 +28,15 @@ class UserListView(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]  # only admin sees all users
 
 
+class CurrentUserView(generics.RetrieveAPIView):
+    """Identity endpoint used by the separate frontend after JWT login."""
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+
 class TenantOnlyView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 

@@ -23,6 +23,18 @@ python3 manage.py seed_demo_data
 python3 manage.py runserver
 ```
 
+In a second terminal, start the React frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open `http://127.0.0.1:5173/`. Vite proxies `/api` requests to the Django
+server at port 8000. The Django root URL is now an API status response, not a
+second competing interface.
+
 Run the checks with:
 
 ```bash
@@ -33,6 +45,7 @@ python3 manage.py test users.tests properties.tests payments.tests notifications
 ## Core endpoints
 
 - `POST /api/users/register/`
+- `GET /api/users/me/` (the current authenticated user)
 - `POST /api/token/`
 - `GET, POST /api/properties/` (GET is public; POST requires an owner or agent)
 - `GET, PUT, DELETE /api/properties/<id>/`

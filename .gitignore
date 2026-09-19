@@ -34,3 +34,7 @@ htmlcov/
 .tox/
 .coverage
 .pytest_cache/
+
+# React build dependencies and output
+frontend/node_modules/
+frontend/dist/
